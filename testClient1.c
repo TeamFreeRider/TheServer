@@ -8,17 +8,8 @@
 
 #define  BUFF_SIZE   1024
 
-int CharToInt(char chunk[], int index, int length)
-{
-   int result = 0; int i;
-   char arr[3];
-   for(i = 0 ; i < length ; i++)
-   {
-      arr[i] = chunk[i + index];
-   }
-   result = atoi(arr);
-   return result;
-}
+int CharToInt(char chunk[], int index, int length);
+
 
 int main( int argc, char **argv)
 {
@@ -37,6 +28,7 @@ int main( int argc, char **argv)
       int calculated_best = -1;//default value
       //calculated_best = 80;
       //you should write a code that reads the txt file and input the value of the variable
+      //reply - no you don't need to
 
       if( -1 == client_socket)
       {
@@ -47,7 +39,7 @@ int main( int argc, char **argv)
       memset( &server_addr, 0, sizeof( server_addr));
       server_addr.sin_family = AF_INET;
       server_addr.sin_port = htons(4000);
-      server_addr.sin_addr.s_addr= inet_addr("192.168.0.21");//write the server ip address
+      server_addr.sin_addr.s_addr= inet_addr("192.168.0.16");//write the server ip address
 
       if( -1 == connect( client_socket, (struct sockaddr*)&server_addr, sizeof( server_addr) ) )
       {
@@ -89,4 +81,17 @@ int main( int argc, char **argv)
       sleep(1);//1 second    
    }
    return 0;
+}
+
+
+int CharToInt(char chunk[], int index, int length)
+{
+   int result = 0; int i;
+   char arr[3];
+   for(i = 0 ; i < length ; i++)
+   {
+      arr[i] = chunk[i + index];
+   }
+   result = atoi(arr);
+   return result;
 }
