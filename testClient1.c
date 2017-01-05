@@ -33,9 +33,9 @@ int main( int argc, char **argv)
 
       client_socket  = socket( PF_INET, SOCK_STREAM, 0);
 
-      int User_PosX, User_PosY, User_DesX, User_DesY, weight, Car_PosX, Car_PosY;
-      int calculated_weight = -1;//default value
-      calculated_weight = 80;
+      int User_PosX, User_PosY, User_DesX, User_DesY, weight, Car_PosX, Car_PosY, In_locX, In_locY;
+      int calculated_best = -1;//default value
+      //calculated_best = 80;
       //you should write a code that reads the txt file and input the value of the variable
 
       if( -1 == client_socket)
@@ -56,11 +56,11 @@ int main( int argc, char **argv)
       }
 
       char arr_t[20]; int k;
-      if(calculated_weight == -1)
+      if(calculated_best == -1)
       {printf("다익스트라 알고리즘이 변수에 전달 안됨 /n");}
       else
       {
-         sprintf(arr_t,"%d", calculated_weight);
+         sprintf(arr_t,"%d", calculated_best);
          for(k = 0 ; k < strlen(arr_t) ; k++)
          {
             Data_send[k + 1] = arr_t[k];
@@ -80,7 +80,8 @@ int main( int argc, char **argv)
       weight = CharToInt(buff,12,3);
       Car_PosX = CharToInt(buff,15,3);
       Car_PosY = CharToInt(buff,18,3);
-
+      In_locX = CharToInt(buff,21,3);
+      In_locY CharToInt(buff,24,3);
       //printf("%s\n", buff);
       printf( "%d \n", User_PosX); printf( "%d \n", User_PosY); printf( "%d \n", User_DesX); printf( "%d \n", User_DesY); printf( "%d \n", weight);
       printf( "%d \n", Car_PosX); printf( "%d \n", Car_PosY);
