@@ -1,16 +1,15 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-this code is for parsing locations.txt
+int main() {
+    FILE *file;
+    char buf[1000];
 
-char str[999];
-FILE * file;
-file = fopen("locations.txt", "r");
-if (file) {
-    while (fscanf(file, "%s", str) != EOF)
-	printf("%s",str);
-    fclose;
+    file = fopen("locations.txt", "r");
+    if (!file) return 1;
+    
+    while (fgets(buf, 1000, file) != NULL) 
+	printf("%s", buf);
+
+    fclose(file);
+    return 0;
 }
-
-
