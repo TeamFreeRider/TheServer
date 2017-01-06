@@ -22,7 +22,7 @@ int main (void)
 
    char buff_rcv[BUFF_SIZE+5];//26,30
    char buff_snd[BUFF_SIZE+5];
-   char Data_send[27] = {'1','0','0','2','0','0','1','2','9','5','4','7','0','0','1','6','1','1','3','1','1','5','0','0','5','0','0'};//sample data
+   char Data_send[10] = {0};
    //char User_Pos[2], User_Des[2], weight;
    //order : P,user position x , user position y, user destination x, user destination y, weight
    int weight = 1;
@@ -67,11 +67,11 @@ int main (void)
          exit(1);
       }
 
-      char buf[100];
-
+      char buf[10];
+ 
       file = fopen("locations.txt", "r");
       while (fgets(buf, 100, file) != NULL)
-         for ( int i=0; i < strlen(buf); i++ )
+         for ( int i=0; i<8; i++ )
             Data_send[i] = buf[i];
       fclose(file);
 
@@ -88,9 +88,8 @@ int main (void)
    }
 }
 
-
-
 /*
 buf[100] : buffer array copied from locations.txt 
 This text file is written from image processing program
 */
+
