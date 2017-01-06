@@ -1,6 +1,25 @@
 # TheServer
 C Socket Server, (also C++ image receiving socket server is included)
 
+git push --set-upstream origin celine
+
+
+   RPi     ->     PC
+(clinet)       (Server)
+jpg image    img process
+
+
+the received image is processed in realtime in PC
+in image processing program, location.txt is opened everytime newly.
+the text file is located in TheServer directory.
+The testserver exe file reads location.txt and hand it over to client
+client receive char array and convert it into inteager.
+if converted inteager is not in between 0~9, it's dropped.
+
+Server Sends the refined serial location packet to Client 
+2 bits for each x, y positions, 8 bits in total.
+
+
 
 서버 status
 B: 서버랑 클라이언트가 멍때리고 있다가 (클라이언트가 자신의 시리얼넘버만 보내는 상태)

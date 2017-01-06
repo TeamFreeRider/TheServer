@@ -11,6 +11,8 @@
 int main (void)
 {
 
+   FILE *file;
+
    int server_socket;
    int client_socket;
    int client_addr_size;
@@ -65,6 +67,14 @@ int main (void)
          exit(1);
       }
 
+      char buf[100];
+
+      file = fopen("locations.txt", "r");
+      while (fgets(buf, 100, file) != NULL)
+         for ( int i=0; i < strlen(buf); i++ )
+            Data_send[i] = buf[i];
+      fclose(file);
+
       read ( client_socket, buff_rcv, BUFF_SIZE);
       printf( "receive: %s\n", buff_rcv);
       //send weight, User_info data to the client
@@ -77,3 +87,10 @@ int main (void)
       close( client_socket);
    }
 }
+
+
+
+/*
+buf[100] : buffer array copied from locations.txt 
+This text file is written from image processing program
+*/
