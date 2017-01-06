@@ -1,14 +1,14 @@
 # TheServer
 C Socket Server, (also C++ image receiving socket server is included)
 
-git push --set-upstream origin celine
-
+'''
 
    RPi     ->     PC
 (clinet)       (Server)
 jpg image    img process
+'''
 
-
+# Data Flow
 the received image is processed in realtime in PC
 in image processing program, location.txt is opened everytime newly.
 the text file is located in TheServer directory.
@@ -21,7 +21,7 @@ Server Sends the refined serial location packet to Client
 
 
 
-서버 status
+# 서버 status
 B: 서버랑 클라이언트가 멍때리고 있다가 (클라이언트가 자신의 시리얼넘버만 보내는 상태)
 M: 모바일에서 사용자 관련 정보들을 입력하면 서버에서 클라이언트한테 사용자 정보를 입력한다.
 D: 클라이언트에서 다익스트라를 돌린 다음에 거리값을 반환한다. 
