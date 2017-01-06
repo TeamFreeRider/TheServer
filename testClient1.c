@@ -17,11 +17,17 @@ int CharToInt(char chunk[], int index, int length)
       arr[i] = chunk[i + index];
    }
    result = atoi(arr);
-   return result;
+   return result;//ascii 변환 코드로 반영
 }
 
 int main( int argc, char **argv)
 {
+   int userloc[2], dest[2], weight, carloc[2], interruptloc[2], onboard;
+   int calculated_best = -1;//default value
+
+   char orderstaus = 'A';
+   //B : 연결만 되어 있고 아무것도 안하는 상태,  
+   char selectedserial = 'x';
 
    while(1){
 
@@ -30,12 +36,10 @@ int main( int argc, char **argv)
       struct sockaddr_in   server_addr;
       char buff[BUFF_SIZE+5];
       char Data_send[100];
-      char selectedserial = 'x';
 
       client_socket  = socket( PF_INET, SOCK_STREAM, 0);
 
-      int userloc[2], dest[2], weight, carloc[2], interruptloc[2], onboard;
-      int calculated_best = -1;//default value
+
       //calculated_best = 80;
       //you should write a code that reads the txt file and input the value of the variable
 
@@ -83,9 +87,9 @@ int main( int argc, char **argv)
       carloc[1] = CharToInt(buff,18,3);
       interruptloc[0] = CharToInt(buff,21,3);
       interruptloc[1]= CharToInt(buff,24,3);
-      //printf("%s\n", buff);
-      printf( "%d \n", userloc[0]); printf( "%d \n", userloc[1]); printf( "%d \n", dest[0]); printf( "%d \n", dest[1]); printf( "%d \n", weight);
-      printf( "%d \n", carloc[0]); printf( "%d \n", carloc[1]); printf( "%d \n", interruptloc[0]); printf( "%d \n", interruptloc[1]);
+      printf("%s\n", buff);
+      //printf( "%d \n", userloc[0]); printf( "%d \n", userloc[1]); printf( "%d \n", dest[0]); printf( "%d \n", dest[1]); printf( "%d \n", weight);
+      //printf( "%d \n", carloc[0]); printf( "%d \n", carloc[1]); printf( "%d \n", interruptloc[0]); printf( "%d \n", interruptloc[1]);
       close(client_socket);  
       sleep(1);//1 second    
    }
