@@ -20,9 +20,9 @@ int main (void)
 
    char buff_rcv[BUFF_SIZE+5];//26,30
    char buff_snd[BUFF_SIZE+5];
-   char Data_send[27] = {'1','0','0','2','0','0','1','2','9','5','4','7','0','0','1','6','1','1','3','1','1','5','0','0','5','0','0'};//sample data
+   char Data_send[27] = {'1','0','2','0','1','2','5','4','0','1','6','1','1','3','1','1','1','1'};//sample data
    //char User_Pos[2], User_Des[2], weight;
-   //order : P,user position x , user position y, user destination x, user destination y, weight
+   //order : P,user position x , user position y, user destination x, user destination y, weight, 차1의 좌표, 차2의 좌표
    int weight = 1;
 
    //User_Pos[0] = 100; User_Pos[1] = 200; User_Des[0] = 129; User_Des[1] = 547;

@@ -11,7 +11,7 @@
 int CharToInt(char chunk[], int index, int length)
 {
    int result = 0; int i;
-   char arr[3];
+   char arr[2];
    for(i = 0 ; i < length ; i++)
    {
       arr[i] = chunk[i + index];
@@ -25,8 +25,8 @@ int main( int argc, char **argv)
    int userloc[2], dest[2], weight, carloc[2], interruptloc[2], onboard;
    int calculated_best = -1;//default value
 
-   char orderstaus = 'A';
-   //B : 연결만 되어 있고 아무것도 안하는 상태,  
+   char orderstatus = 'B';
+   //B,M,D,R,W,A,F... 
    char selectedserial = 'x';
 
    while(1){
@@ -36,7 +36,7 @@ int main( int argc, char **argv)
       struct sockaddr_in   server_addr;
       char buff[BUFF_SIZE+5];
       char Data_send[100];
-
+      //Data_send : (Car Serial), (orderstatus), (distance return)
       client_socket  = socket( PF_INET, SOCK_STREAM, 0);
 
 
@@ -73,23 +73,24 @@ int main( int argc, char **argv)
       }
 
       Data_send[0] = 'R';
+      Data_send[1] = orderstatus;
       //write( client_socket, argv[1], strlen( argv[1])+1);      // +1: NULL까지 포함해서 전송
       //write( client_socket, "R", strlen("R") + 1);//sending its car serial number car1 : 1, car2 : 2
       write( client_socket, Data_send, strlen(Data_send) + 1);
       read ( client_socket, buff, BUFF_SIZE);
 
-      userloc[0] = CharToInt(buff,0,3);
-      userloc[1] = CharToInt(buff,3,3);
-      dest[0] = CharToInt(buff,6,3);
-      dest[1] = CharToInt(buff,9,3);
-      weight = CharToInt(buff,12,3);
-      carloc[0] = CharToInt(buff,15,3);
-      carloc[1] = CharToInt(buff,18,3);
-      interruptloc[0] = CharToInt(buff,21,3);
-      interruptloc[1]= CharToInt(buff,24,3);
-      printf("%s\n", buff);
-      //printf( "%d \n", userloc[0]); printf( "%d \n", userloc[1]); printf( "%d \n", dest[0]); printf( "%d \n", dest[1]); printf( "%d \n", weight);
-      //printf( "%d \n", carloc[0]); printf( "%d \n", carloc[1]); printf( "%d \n", interruptloc[0]); printf( "%d \n", interruptloc[1]);
+      userloc[0] = CharToInt(buff,0,2);
+      userloc[1] = CharToInt(buff,2,2);
+      dest[0] = CharToInt(buff,4,2);
+      dest[1] = CharToInt(buff,6,2);
+      weight = CharToInt(buff,8,2);
+      carloc[0] = CharToInt(buff,10,2);
+      carloc[1] = CharToInt(buff,12,2);
+      interruptloc[0] = CharToInt(buff,14,2);
+      interruptloc[1]= CharToInt(buff,16,2);
+      //printf("%s\n", buff);
+      printf( "%d \n", userloc[0]); printf( "%d \n", userloc[1]); printf( "%d \n", dest[0]); printf( "%d \n", dest[1]); printf( "%d \n", weight);
+      printf( "%d \n", carloc[0]); printf( "%d \n", carloc[1]); printf( "%d \n", interruptloc[0]); printf( "%d \n", interruptloc[1]);
       close(client_socket);  
       sleep(1);//1 second    
    }
