@@ -22,7 +22,7 @@ int main (void)
 
    char buff_rcv[BUFF_SIZE+5];//26,30
    char buff_snd[BUFF_SIZE+5];
-   char Data_send[10] = {0};
+   char Data_send[8];
    //char User_Pos[2], User_Des[2], weight;
    //order : P,user position x , user position y, user destination x, user destination y, weight
    int weight = 1;
@@ -66,6 +66,10 @@ int main (void)
          printf( "클라이언트 연결 수락 실패\n");
          exit(1);
       }
+      
+      //flush array
+      for ( int i=0; i<10; i++ )
+	 Data_send[i] = 0; 
 
       char buf[10];
  
