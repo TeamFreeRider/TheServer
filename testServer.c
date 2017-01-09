@@ -1,3 +1,15 @@
+// When Call User sends present locations and destination location to server,
+// Server sends User's present location, Blue's location and Red's location
+// user's destination point can be sent after car arrives at user's point.. 
+// client returns 'distance value' to server if it's located near enough.
+// After a car is designated, Server sends Data_send[8] to client.
+// This array has Red's loc and Blue's loc
+// When journey to user's loc is finished, 
+// Server sends the user's destination, Red and blue's loc information. arry[12]
+// Server receives 'onBoard' value from Call User and hands it over to client 
+// send Data_send[8] to client.. 
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +23,8 @@
 int main (void)
 {
 
+   FILE *file;
+
    int server_socket;
    int client_socket;
    int client_addr_size;
@@ -20,6 +34,7 @@ int main (void)
 
    char buff_rcv[BUFF_SIZE+5];//26,30
    char buff_snd[BUFF_SIZE+5];
+   
    char Data_send[18] = {'1','0','2','0','1','2','5','4','0','1','6','1','1','3','1','1','1','1'};//sample data
    //char Data_send[18];
    //char User_Pos[2], User_Des[2], weight;
@@ -65,6 +80,18 @@ int main (void)
          printf( "클라이언트 연결 수락 실패\n");
          exit(1);
       }
+      
+      //flush array
+      for ( int i=0; i<10; i++ )
+	 Data_send[i] = 0; 
+
+      char buf[10];
+ 
+      file = fopen("locations.txt", "r");
+      while (fgets(buf, 100, file) != NULL)
+         for ( int i=0; i<8; i++ )
+            Data_send[i] = buf[i];
+      fclose(file);
 
       read ( client_socket, buff_rcv, BUFF_SIZE);
       printf( "receive: %s\n", buff_rcv);
@@ -78,3 +105,9 @@ int main (void)
       close( client_socket);
    }
 }
+
+/*
+buf[100] : buffer array copied from locations.txt 
+This text file is written from image processing program
+*/
+
