@@ -1,3 +1,11 @@
+// When Call User sends present locations and destination location to server,
+// Server sends User's present location, Blue's location and Red's location
+// user's destination point can be sent after car arrives at user's point.. 
+// client returns 'distance value' to server if it's located near enough.
+// 
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
