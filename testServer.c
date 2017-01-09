@@ -34,9 +34,11 @@ int main (void)
 
    char buff_rcv[BUFF_SIZE+5];//26,30
    char buff_snd[BUFF_SIZE+5];
-   
+
    char Data_send[18] = {'1','0','2','0','1','2','5','4','0','1','6','1','1','3','1','1','1','1'};//sample data
-   //char Data_send[18];
+   //just for testing
+   char DataSend_B[18], DataSend_M[18], DataSend_D[18], DataSend_R[18], DataSend_W[18],
+   DataSend_A[18], DataSend_F[18];
    //char User_Pos[2], User_Des[2], weight;
    //order : P,user position x,user position y , u user destination x, user destination y, weight, 차1의 좌표, 차2의 좌표
    int range = 1;//다이스트라 탐색범위.. 
@@ -81,9 +83,10 @@ int main (void)
          exit(1);
       }
       
+
       //flush array
       for ( int i=0; i<10; i++ )
-	 Data_send[i] = 0; 
+	     Data_send[i] = 0; 
 
       char buf[10];
  

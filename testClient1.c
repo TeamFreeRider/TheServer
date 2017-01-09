@@ -32,7 +32,7 @@ int CharToInt(char chunk[], int index, int length)
 
 int main( int argc, char **argv)
 {
-   int userloc[2], dest[2], weight, carloc[2], interruptloc[2], onboard;
+   int userloc[2], dest[2], range, carloc[2], interruptloc[2], onboard;
    int calculated_best = -1;//default value
 
    char orderstatus = 'B';
@@ -45,7 +45,7 @@ int main( int argc, char **argv)
 
       struct sockaddr_in   server_addr;
       char buff[BUFF_SIZE+5];
-      char Data_send[100];
+      char Data_send[10];
       //Data_send : (Car Serial), (orderstatus), (distance return)
       client_socket  = socket( PF_INET, SOCK_STREAM, 0);
 
@@ -93,7 +93,7 @@ int main( int argc, char **argv)
       userloc[1] = CharToInt(buff,2,2);
       dest[0] = CharToInt(buff,4,2);
       dest[1] = CharToInt(buff,6,2);
-      weight = CharToInt(buff,8,2);
+      range = CharToInt(buff,8,2);
       carloc[0] = CharToInt(buff,10,2);
       carloc[1] = CharToInt(buff,12,2);
       interruptloc[0] = CharToInt(buff,14,2);
