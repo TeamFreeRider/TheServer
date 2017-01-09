@@ -9,6 +9,11 @@
 // Server receives 'onBoard' value from Call User and hands it over to client 
 // send Data_send[8] to client.. 
 
+//Data_send_M[8] : user's present, destination, R or B's locations
+//Data_send_R[8] : Red and Blue's locations...
+//Data_send_W[5] : 1/Y and user's destination locations
+
+
 
 #include <stdio.h>
 #include <stdlib.h>
