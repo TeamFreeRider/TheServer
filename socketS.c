@@ -1,19 +1,3 @@
-// When Call User sends present locations and destination location to server,
-// Server sends User's present location, Blue's location and Red's location
-// user's destination point can be sent after car arrives at user's point.. 
-// client returns 'distance value' to server if it's located near enough.
-// After a car is designated, Server sends Data_send[8] to client.
-// This array has Red's loc and Blue's loc
-// When journey to user's loc is finished, 
-// Server sends the user's destination, Red and blue's loc information. arry[12]
-// Server receives 'onBoard' value from Call User and hands it over to client 
-// send Data_send[8] to client.. 
-
-//Data_send_M[8] : user's present, destination, R or B's locations
-//Data_send_R[8] : Red and Blue's locations... default mode
-//Data_send_W[5] : 1/Y and user's destination locations
-
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +8,6 @@
 #include <sys/socket.h>
 
 #define  BUFF_SIZE   1024
-
 
 int main (void)
 {
@@ -92,42 +75,30 @@ int main (void)
 
         //flush array
         for ( int i=0; i<10; i++ )
-	      Data_send[i] = 0; 
+	    Data_send[i] = 0; 
 
-        char buf[10];
+       char buf[10];
  
-        file = fopen("locations.txt", "r");
-        while (fgets(buf, 100, file) != NULL)
-            for ( int i=0; i<8; i++ )
-                Data_send[i] = buf[i];
-        fclose(file);
+       file = fopen("locations.txt", "r");
+       while (fgets(buf, 100, file) != NULL)
+           for ( int i=0; i<8; i++ )
+               Data_send[i] = buf[i];
+       fclose(file);
 
-        read ( client_socket, buff_rcv, BUFF_SIZE);
-        printf( "receive: %s\n", buff_rcv);
-        //send weight, User_info data to the client
-        //receive distance value from the client
-        //if server receives distance value and all the values are returning z value, weight++
-        //if min value is defined, send the activation data to the car which has the min value
-        sprintf( buff_snd, "%d : %s", strlen( buff_rcv), buff_rcv);
-        //write( client_socket, buff_snd, strlen( buff_snd)+1);          // +1: NULL까지 포함해서 전송
-        write( client_socket, Data_send, strlen(Data_send)+1);
-        close( client_socket);
+       read ( client_socket, buff_rcv, BUFF_SIZE);
+       printf( "receive: %s\n", buff_rcv);
+       //send weight, User_info data to the client
+       //receive distance value from the client
+       //if server receives distance value and all the values are returning z value, weight++
+       //if min value is defined, send the activation data to the car which has the min value
+       sprintf( buff_snd, "%d : %s", strlen( buff_rcv), buff_rcv);
+       //write( client_socket, buff_snd, strlen( buff_snd)+1);          // +1: NULL까지 포함해서 전송
+       write( client_socket, Data_send, strlen(Data_send)+1);
+       close( client_socket);
     }
 }
 
-
-void send_R
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
+buf[100] : buffer array copied from locations.txt 
+This text file is written from image processing program
+*/

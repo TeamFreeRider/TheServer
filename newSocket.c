@@ -14,7 +14,6 @@
 //Data_send_W[5] : 1/Y and user's destination locations
 
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +23,10 @@
 #include <sys/socket.h>
 
 #define  BUFF_SIZE   1024
+#define  REQUEST    0
 
+
+int fileOpen();
 
 int main (void)
 {
@@ -41,10 +43,9 @@ int main (void)
     char buff_rcv[BUFF_SIZE+5];//26,30
     char buff_snd[BUFF_SIZE+5];
 
-    char Data_send[18] = {'1','0','2','0','1','2','5','4','0','1','6','1','1','3','1','1','1','1'};//sample data
-    //just for testing
-    char DataSend_B[18], DataSend_M[18], DataSend_D[18], DataSend_R[18], DataSend_W[18],
-    DataSend_A[18], DataSend_F[18];
+    char DataSend_M[12], DataSend_R[8], DataSend_W[5];
+    char User_Location[4], User_Destination[4];
+    
     //char User_Pos[2], User_Des[2], weight;
     //order : P,user position x,user position y , u user destination x, user destination y, weight, 차1의 좌표, 차2의 좌표
     int range = 1;//다이스트라 탐색범위.. 
@@ -65,37 +66,54 @@ int main (void)
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     //bind is needed for saving address information, ip & port info is connected to socket
-    if( -1 == bind( server_socket, (struct sockaddr*)&server_addr, sizeof( server_addr) ) )
-    {
+    if( -1 == bind( server_socket, (struct sockaddr*)&server_addr, sizeof( server_addr) ) ){
         printf( "bind() 실행 에러\n");
         exit(1);
     }
 
-    if( -1 == listen(server_socket, 5))
-    {
+    if( -1 == listen(server_socket, 5)){
         printf( "listen() 실행 실패\n");
         exit(1);
     }
 
+    client_addr_size = sizeof(client_addr);
+    client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
+
+    if ( -1 == client_socket){
+        printf( "클라이언트 연결 수락 실패\n");
+        exit(1);
+      }
+
+// Above code is for accepting connections from client
+/*
+    if ( REQUEST == 1 ){
+        strcpy( Data_send_M, User_Location );
+        char* Locations = fileOpen();
+        for ( int i=0; i<8; i++ )
+            Data_send_M[i+4] = Locations[i];
+        write( clinet_socket, Data_send_M, strlen);
+    }              
+
+    struct weight {
+        char color;
+        int distance;
+    };
+
+    struct weight car1;
+    struct weight car2;
+
+    read (clinet_socket, buff_rcv, BUFF_SIZE);
+*/
+
+
     while(1)//infinite loop
-    {
-
-        client_addr_size = sizeof(client_addr);
-        client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
-
-        if ( -1 == client_socket)
-        {
-            printf( "클라이언트 연결 수락 실패\n");
-            exit(1);
-        }
-      
-
+    {      
         //flush array
         for ( int i=0; i<10; i++ )
 	      Data_send[i] = 0; 
 
+        //buf[10] is for reading locations text file 
         char buf[10];
- 
         file = fopen("locations.txt", "r");
         while (fgets(buf, 100, file) != NULL)
             for ( int i=0; i<8; i++ )
@@ -111,14 +129,23 @@ int main (void)
         sprintf( buff_snd, "%d : %s", strlen( buff_rcv), buff_rcv);
         //write( client_socket, buff_snd, strlen( buff_snd)+1);          // +1: NULL까지 포함해서 전송
         write( client_socket, Data_send, strlen(Data_send)+1);
-        close( client_socket);
     }
+
+    close( client_socket);
+ }
+
+
+
+
+char fileOpen(){
+    char buffer[8]; Locations[8];
+    file = fopen("locations.txt", "r");
+    while (fgets(buffer, 100, file) != NULL)
+        for (int i=0; i<8; i++)
+            Locations[i] = buffer[i];
+    fclose(file);
+    return Locations;
 }
-
-
-void send_R
-
-
 
 
 
