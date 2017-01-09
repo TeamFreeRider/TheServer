@@ -2,8 +2,12 @@
 // Server sends User's present location, Blue's location and Red's location
 // user's destination point can be sent after car arrives at user's point.. 
 // client returns 'distance value' to server if it's located near enough.
-// 
-
+// After a car is designated, Server sends Data_send[8] to client.
+// This array has Red's loc and Blue's loc
+// When journey to user's loc is finished, 
+// Server sends the user's destination, Red and blue's loc information. arry[12]
+// Server receives 'onBoard' value from Call User and hands it over to client 
+// send Data_send[8] to client.. 
 
 
 #include <stdio.h>
