@@ -103,7 +103,14 @@ int main (void)
         fclose(file);
 
         read ( client_socket, buff_rcv, BUFF_SIZE);
-        printf( "receive: %s\n", buff_rcv);
+
+//	printf("%s", buff_rcv);
+
+	if ( buff_rcv[0] == 'R') printf("R.... \n");
+	else if (buff_rcv[0] == 'B') printf("B... \n");
+	else 
+
+//        printf( "receive: %s\n", buff_rcv );
         //send weight, User_info data to the client
         //receive distance value from the client
         //if server receives distance value and all the values are returning z value, weight++
@@ -114,9 +121,6 @@ int main (void)
         close( client_socket);
     }
 }
-
-
-void send_R
 
 
 
