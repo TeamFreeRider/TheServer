@@ -88,11 +88,12 @@ int main (void)
             printf( "클라이언트 연결 수락 실패\n");
             exit(1);
         }
-      
 
+/*
+        read ( client_socket, buff_rcv, BUFF_SIZE);
         //flush array
         for ( int i=0; i<10; i++ )
-	      Data_send[i] = 0; 
+          Data_send[i] = 0; 
 
         char buf[10];
  
@@ -101,14 +102,23 @@ int main (void)
             for ( int i=0; i<8; i++ )
                 Data_send[i] = buf[i];
         fclose(file);
+    	printf("%s", Data_send);
+*/
+        read( client_socket, buff_rcv, sizeof(buff_rcv) );
 
-        read ( client_socket, buff_rcv, BUFF_SIZE);
 
-//	printf("%s", buff_rcv);
+        if ( buff_rcv[0] == 'R' ) {
+            Data_send[0] = 'R'; Data_send[1] = 'R'; Data_send[2] = 'R';
+            write( client_socket, Data_send, strlen(Data_send)+1 );
+            printf("serial is Red\n");
+        }
+        else if ( buff_rcv[0] == 'B') {
+            Data_send[0] = 'B'; Data_send[1] = 'B'; Data_send[2] = 'B';
+            write( client_socket, Data_send, strlen(Data_send)+1 );
+            printf("serial is Blue\n");
+        }
 
-	if ( buff_rcv[0] == 'R') printf("R.... \n");
-	else if (buff_rcv[0] == 'B') printf("B... \n");
-	else 
+
 
 //        printf( "receive: %s\n", buff_rcv );
         //send weight, User_info data to the client

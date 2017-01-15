@@ -19,17 +19,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 
+
 #define  BUFF_SIZE   1024
 
-
+        
 int main (void)
 {
-
     FILE *file;
+
+    int i,j;
+
+//    time_t bfrSEC, aftrSEC;
 
     int server_socket;
     int client_socket;
@@ -41,17 +46,22 @@ int main (void)
     char buff_rcv[BUFF_SIZE+5];//26,30
     char buff_snd[BUFF_SIZE+5];
 
-    //just for testing
-    char DataSend_M[12], DataSend_R[8], DataSend_W[4];
-    DataSend_M[0]='P';DataSend_W[0]='D';
-    int range = 1;//다이스트라 탐색범위.. 
-
+    //P: present, R:running, D: destination, C: car..
+    char DataSend_P[8], DataSend_R[10], DataSend_D[8], DataSend_C[3];
+    DataSend_P[0]='P'; DataSend_R[0]='S'; DataSend_D[0]='D'; DataSend_C[0]='C'; 
+    DataSend_P[6]='E'; DataSend_R[9]='E'; DataSend_D[6]='E'; DataSend_C[2]='E';
+    //int range = 1;//다이스트라 탐색범위.. 
     struct car_info {
 	char color;
 	int cost;
     };
 
-    int i,j;
+    struct car_info carlist[5];
+
+    for ( i=0; i<5; i++ ){
+        carlist[i].cost = -1;
+        carlist[i].color = '\0';
+    }
 
     server_socket = socket( PF_INET, SOCK_STREAM, 0);
     if( -1 == server_socket)
@@ -77,109 +87,219 @@ int main (void)
 
     while(1)//outer infinite loop
     {
+        int onBoard = 0;
+        int range = 1;// initialize range as 1..
+        int mini = 0;
+        int index = 0;
+        int receive = 0;
+
+
+
+
         client_addr_size = sizeof(client_addr);
         client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
         if ( -1 == client_socket) {
-            printf( "클라이언트 연결 수락 실패\n");
-            exit(1);
-        }
+            printf( "failed to accept\n");
+            exit(1);}
+
+        read(client_socket, buff_rcv, BUFF_SIZE);
+        printf("%s\n", buff_rcv);
+
+        close( client_socket );
+        switch (buff_rcv[0]) {
+
+            case 'x' : 
+
 /*Number 1*/      
 	   while (1) {	
+        
+            client_addr_size = sizeof(client_addr);
+            client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
+            if ( -1 == client_socket) {
+                printf( "fail\n");
+                exit(1);
+            }
+        
             char buf[10]; 
             file = fopen("locations.txt", "r");
-            while (fgets(buf, 100, file) != NULL)
+            while (fgets(buf, 10, file) != NULL)
                 for ( int i=0; i<8; i++ )
-                    DataSend_R[i] = buf[i];
+                    DataSend_R[i+1] = buf[i];
             fclose(file);
 	        write( client_socket, DataSend_R, strlen( DataSend_R )+1 );
- 	        read( client_socket, buff_rcv, BUFF_SIZE);
-	        if (buff_rcv[0] == 'C') { 
-                    for ( int i=0; i<4; i++ ){
-                        DataSend_M[i+2] = buff_rcv[i+1];
-		        DataSend_W[i+2] = buff_rcv[i+5];
+            printf("%s\n", DataSend_R);
+
+            read( client_socket, buff_rcv, BUFF_SIZE);            
+	        if (buff_rcv[0] == 'C'){ 
+                for ( int i=0; i<4; i++ ){
+                    DataSend_P[i+2] = buff_rcv[i+1];
+		            DataSend_D[i+2] = buff_rcv[i+5];
 	            }
-		    break;
+                printf("user call : %s\n",buff_rcv);
+                printf("break\n");
+		        break; 
 	        }
-	    }
+            printf("rewind\n");
+
+        }
 	//if request(C:call) singal comes in, save data and move on to next
 	//strlen(REQUEST) will be 9 ('C' + present[4] + dest[4])
 
+            client_addr_size = sizeof(client_addr);
+            client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
+            if ( -1 == client_socket) {
+                printf( "fail\n");
+                exit(1);
+            }
 
+
+            printf("out of 1st loop\n");
+            DataSend_P[0] = 'P';
+            DataSend_P[1] = range + '0';
+            write( client_socket, DataSend_P, strlen( DataSend_P )+1 );
+            printf("%s를 보냄\n", DataSend_P);
+            close ( client_socket );
+//            time(&bfrSEC);
+
+
+            case 'y' :  
 /*Number 2*/
 	//initialize
-	    struct car_info carlist[10];
-	    for ( i=0; i<10; i++ ){
-	        carlist[i].cost = -1;
-	        carlist[i].color = '\0';
-	    }
-
-    	int index = 0;
+    	/*
 	    int range = 1;// initialize range as 1..
-	    while (1){   	
-    	    DataSend_M[0] = 'P';
-            DataSend_M[1] = range;
-            write( client_socket, DataSend_M, strlen( DataSend_M )+1 );
-            sleep(1);
-//	    color ack; ack.red = -1; ack.blue = -1;
-	//should wait until ack signal comes in.. 
-
-	        for ( int i=0; i<10; i++ ){
-	            CARLIST : read( client_socket, buff_rcv, BUFF_SIZE );
-    	        if ( buff_rcv[0] == 'a' ){ //a: acknowledge
-		            for ( j=0; j<index; j++ )//check if this color already exist in carlist
-			            if (carlist[j].color == buff_rcv[1]) goto CARLIST;
-		            carlist[index].color = buff_rcv[1];
-	 	            carlist[index].cost = buff_rcv[2];
-		            index++;
-		        }
-	        }
-	        for ( i=0; i<10; i++ )
-		        if (carlist[i].cost > 0) { 
-		            index--; goto FINDMIN;
-		        }
-	        range++; // if all value is lower than 0, add 1 to range
-	    }
-/*Number 3*/
         int mini = 0;
-	    FINDMIN : 
-	    for ( i=0; i<index; i++ )
-  	        if (carlist[i].cost < carlist[mini].cost) mini = i;
-	    write( client_socket, carlist[mini].color, strlen(carlist[mini].color)+1 ); // send selected car info
-
-        //run run run until get User's Present location..
-        int running = 1;
-        int onBoard = 0;
-        while ( running ){
-            char buf[10] = {'\0'}; 
-            file = fopen("locations.txt", "r");
-            while (fgets(buf, 100, file) != NULL)
-                for ( int i=0; i<8; i++ )
-                    DataSend_R[i] = buf[i];
-            fclose(file);
-            write( client_socket, DataSend_R, strlen(DataSend_R)+1 );
-            read( client_socket, buff_rcv, BUFF_SIZE);
-            
-            if ( buff_rcv[0] == 'U' ){ // receive from mobile application 
-                if ( buff_rcv[1] == 1 ){ //arrive at User's Present Location
-                    onBoard = 1;
-                    DataSend_W[1] = onBoard;
-                    write( client_socket, DataSend_W, strlen(DataSend_W)+1 );
-                }
-                else if ( buff_rcv[1] == 0 ){ 
-                    onBoard = 0; // arrive at destination
-                    running = 0;
-                    write( client_socket, , strlen('0')+1 );
-                }
-                do {
-                    read( client_socket, buff_rcv, BUFF_SIZE );
-                    }while(buff_rcv[0] != 'a');
+        int index = 0;
+	    */
+        RECEIVE : 
+        while (1){        
+            client_addr_size = sizeof(client_addr);
+            client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
+            if ( -1 == client_socket) {
+                printf( "fail\n");
+                exit(1);
             }
+/*
+            printf("2nd loop\n");
+    	    DataSend_P[0] = 'P';
+            DataSend_P[1] = range + '0';
+            write( client_socket, DataSend_P, strlen( DataSend_P )+1 );
+            printf("%s를 보냄\n", DataSend_P);
+*/
+
+//            read( client_socket, buff_rcv, BUFF_SIZE);
+
+            
+//            int receive = 0;
+            
+
+//            memset(buff_rcv, 0, sizeof (buff_rcv));
+            read( client_socket, buff_rcv, BUFF_SIZE );
+            int exist =0;
+            printf("%s\n", buff_rcv);
+
+		    for ( j=0; j<index; j++ )//check if this color already exist in carlist
+                if (carlist[j].color == buff_rcv[1]){ 
+                    exist++;
+                    printf("already exist, color: %c\n", buff_rcv[1]);
+                }
+            if ( exist == 0 ){ // save new data
+                carlist[index].color = buff_rcv[1];
+                carlist[index].cost = buff_rcv[2];
+                index++;
+                printf("saved!!\n");
+            }    
+            receive += 1;
+            printf("receive : %d\n", receive);
+//            time(&aftrSEC);
+//            printf("aftrSEC - bfrSEC : %d\n", aftrSEC - bfrSEC);
+            if (receive < 5 ) {
+                printf("back to receive\n");
+                close(client_socket);
+                goto RECEIVE;
+            }
+	        //Find Minimum value..
+            else if ( receive >= 5 && index > 0 ){
+                
+                break;
+            }
+
+	        else range++; // if all value is lower than 0, add 1 to range
         }
+   
+	    FINDMIN : 
+
+        printf("out of 2nd loop\n");
+	    
+        if (index == 1) 
+            DataSend_C[1] = carlist[index].color;
+        else   
+            for ( i=0; i<index; i++ )
+  	             if (carlist[i].cost < carlist[mini].cost) mini = i;
+
+        printf("%c\n",carlist[mini].color);
+        DataSend_C[1]= carlist[mini].color;
+	    write( client_socket, DataSend_C, strlen(DataSend_C)+1 ); // send selected car info
+        close(client_socket);
+        //run run run until get User's Present location..
+/*
+        int onBoard = 0;
+*/
+
+            case 'z' :
+/*Number 3*/
+        while (1){
+            client_addr_size = sizeof(client_addr);
+            client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
+            if ( -1 == client_socket) {
+                printf( "fail\n");
+                exit(1);
+            }
+            write( client_socket, buff_snd, strlen(buff_snd) );
+            if (buff_snd[0] == 'D' && buff_snd[1] == '0') break;
+            read( client_socket, buff_rcv, BUFF_SIZE);
+            printf("%s\n", buff_rcv);
+            if ( buff_rcv[0] == 'U' ){ // receive from mobile application 
+                if ( buff_rcv[1] == '1' ){ //arrive at User's Present Location
+                    printf("user checked in the car \n");
+                    onBoard = 1; // user is now on board
+                    DataSend_D[1]='1';DataSend_D[7]='\0';
+                    //memset(DataSend_D, 0, sizeof(DataSend_D));
+                    strcpy(buff_snd, DataSend_D);
+                    printf("U1 -> %s\n", DataSend_D);
+
+                }
+                else if ( buff_rcv[1] == '0' ){ 
+                    printf("user checked out the car \n");
+                    onBoard = 0; // arrive at destination
+                    DataSend_D[0]='D';DataSend_D[1]='0';DataSend_D[2]='E';DataSend_D[3]='\0';
+                    strcpy(buff_snd, DataSend_D);
+                    printf("U0 -> %s\n", DataSend_D);
+
+                }
+                printf("%s\n", DataSend_D);
+            }
+            else {
+                char buf[10];
+                file = fopen("locations.txt", "r");
+                while (fgets(buf, 10, file) != NULL)
+                    for ( int i=0; i<8; i++ )
+                        DataSend_R[i+1] = buf[i];
+                fclose(file);
+                DataSend_R[7]='\0';
+                strcpy(buff_snd, DataSend_R);
+                printf("%s\n", DataSend_R);
+            }
+            close(client_socket);
+            
+        } // 3rd loop
+    } // switch 
 	
+
+
         //if server receives distance value and all the values are returning z value, weight++;
         //if min value is defined, send the activation data to the car which has the min value
         sprintf( buff_snd, "%d : %s", strlen( buff_rcv), buff_rcv);
-        close( client_socket);
+        close( client_socket );
     }
 }
 
