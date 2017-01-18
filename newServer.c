@@ -93,9 +93,6 @@ int main (void)
         int index = 0;
         int receive = 0;
 
-
-
-
         client_addr_size = sizeof(client_addr);
         client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
         if ( -1 == client_socket) {
@@ -165,12 +162,7 @@ int main (void)
 
             case 'y' :  
 /*Number 2*/
-	//initialize
-    	/*
-	    int range = 1;// initialize range as 1..
-        int mini = 0;
-        int index = 0;
-	    */
+
         RECEIVE : 
         while (1){
             do  {        
@@ -183,21 +175,6 @@ int main (void)
                 read( client_socket, buff_rcv, BUFF_SIZE );
             }while(buff_rcv[2] == '\0');
             printf("%s\n", buff_rcv);
-/*
-            printf("2nd loop\n");
-    	    DataSend_P[0] = 'P';
-            DataSend_P[1] = range + '0';
-            write( client_socket, DataSend_P, strlen( DataSend_P )+1 );
-            printf("%s를 보냄\n", DataSend_P);
-*/
-
-//            read( client_socket, buff_rcv, BUFF_SIZE);
-
-            
-//            int receive = 0;
-            
-
-//            memset(buff_rcv, 0, sizeof (buff_rcv));
 
             int exist =0;
             
@@ -215,17 +192,14 @@ int main (void)
             }    
             receive += 1;
             printf("receive : %d\n", receive);
-//            time(&aftrSEC);
-//            printf("aftrSEC - bfrSEC : %d\n", aftrSEC - bfrSEC);
+
             if (receive < 5 ) {
                 printf("back to receive\n");
                 close(client_socket);
                 goto RECEIVE;
             }
 	        //Find Minimum value..
-            else if ( receive >= 5 && index > 0 ){
-                break;
-            }
+            else if ( receive >= 5 && index > 0 ) break;
 
 	        else range++; // if all value is lower than 0, add 1 to range
         }
@@ -277,8 +251,6 @@ int main (void)
             write( client_socket, buff_snd, strlen(buff_snd) );
             if (buff_snd[0] == 'D' && buff_snd[1] == '0') break;
             
-            
-            
             if ( buff_rcv[0] == 'U' ){ // receive from mobile application 
                 if ( buff_rcv[1] == '1' ){ //arrive at User's Present Location
                     printf("user checked in the car \n");
@@ -309,15 +281,10 @@ int main (void)
                 printf("%s\n", DataSend_R);
             }
             close(client_socket);
-            
         } // 3rd loop
     } // switch 
 	
-
-
-        //if server receives distance value and all the values are returning z value, weight++;
         //if min value is defined, send the activation data to the car which has the min value
-        sprintf( buff_snd, "%d : %s", strlen( buff_rcv), buff_rcv);
         close( client_socket );
     }
 }
