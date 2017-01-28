@@ -122,12 +122,17 @@ int main (void)
             while (fgets(buf, 10, file) != NULL)
                 for ( int i=0; i<8; i++ )
                     DataSend_R[i+1] = buf[i];
-            fclose(file);
-	        write( client_socket, DataSend_R, strlen( DataSend_R )+1 );
-            printf("%s\n", DataSend_R);
-
-            read( client_socket, buff_rcv, BUFF_SIZE);            
-	        if (buff_rcv[0] == 'C'){ 
+            read( client_socket, buff_rcv, BUFF_SIZE);
+            if (buff_rcv[1] == 'R')
+                write( client_socket, DataSend_R, strlen(DataSend_R)+1 );
+            else if (buff_rcv[1] == 'B'){
+                for ( int i=0; i<4; i++ ) {
+                    DataSend_R[i+1] = buf[i+4];
+                    DataSend_R[i+5] = buf[i];
+                }
+                write( client_socket, DataSend_R, strlen(DataSend_R)+1 );
+            }
+	        else if (buff_rcv[0] == 'C'){ 
                 for ( int i=0; i<4; i++ ){
                     DataSend_P[i+2] = buff_rcv[i+1];
 		            DataSend_D[i+2] = buff_rcv[i+5];
@@ -136,8 +141,9 @@ int main (void)
                 printf("break\n");
 		        break; 
 	        }
-            printf("rewind\n");
-
+            printf("%s\n", DataSend_R);
+            fclose(file);
+            
         }
 	//if request(C:call) singal comes in, save data and move on to next
 	//strlen(REQUEST) will be 9 ('C' + present[4] + dest[4])
@@ -165,7 +171,7 @@ int main (void)
 
         RECEIVE : 
         while (1){
-            do  {        
+//            do  {        
                 client_addr_size = sizeof(client_addr);
                 client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
                 if ( -1 == client_socket) {
@@ -173,34 +179,31 @@ int main (void)
                     exit(1);
                 }
                 read( client_socket, buff_rcv, BUFF_SIZE );
-            }while(buff_rcv[2] == '\0');
-            printf("%s\n", buff_rcv);
+//            }while(buff_rcv[2] - 48 > 0);
+            printf("received from %c, distance %d\n", buff_rcv[1], buff_rcv[2] - 48);
 
             int exist =0;
             
-
 		    for ( j=0; j<index; j++ )//check if this color already exist in carlist
                 if (carlist[j].color == buff_rcv[1]){ 
                     exist++;
-                    printf("already exist, color: %c\n", buff_rcv[1]);
+                    printf("already exists, color: %c\n", buff_rcv[1]);
                 }
-            if ( exist == 0 && buff_rcv[2] != '\0'){ // save new data
+            if ( exist == 0 && buff_rcv[2] - 48 > 0 ){ // save new data
                 carlist[index].color = buff_rcv[1];
-                carlist[index].cost = buff_rcv[2];
+                carlist[index].cost = buff_rcv[2] - 48;
+                printf("color: %c, cost: %d saved!!\n", carlist[index].color, carlist[index].cost);
                 index++;
-                printf("saved!!\n");
-            }    
+            }
             receive += 1;
             printf("receive : %d\n", receive);
-
-            if (receive < 5 ) {
+            if ( receive < 4 ) {
                 printf("back to receive\n");
                 close(client_socket);
                 goto RECEIVE;
             }
-	        //Find Minimum value..
-            else if ( receive >= 5 && index > 0 ) break;
-
+	        //Find Minimum value
+            else if ( receive >= 4 && index > 0 ) break;
 	        else range++; // if all value is lower than 0, add 1 to range
         }
         close(client_socket);
@@ -218,16 +221,21 @@ int main (void)
 
         printf("%c\n",carlist[mini].color);
         DataSend_C[1]= carlist[mini].color;
-	    for (int i=0; i<index; i++){
+        i = 0;
+	    do{
             client_addr_size = sizeof(client_addr);
             client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
             if ( -1 == client_socket) {
                 printf( "fail\n");
                 exit(1);
             }
-            write( client_socket, DataSend_C, strlen(DataSend_C)+1 ); // send selected car info
+            read( client_socket, buff_rcv, BUFF_SIZE);
+            if (buff_rcv[1] == carlist[i].color){
+                write( client_socket, DataSend_C, strlen(DataSend_C)+1 ); // send selected car info
+                i++;
+            }
             close(client_socket);
-        }
+        }(while i == index)
         
         //run run run until get User's Present location..
 /*
@@ -237,7 +245,7 @@ int main (void)
             case 'z' :
 /*Number 3*/
         while (1){
-            do{
+            do  {
                 client_addr_size = sizeof(client_addr);
                 client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
                 if ( -1 == client_socket) {
