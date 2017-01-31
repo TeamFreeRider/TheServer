@@ -92,6 +92,7 @@ int main (void)
         int mini = 0;
         int index = 0;
         int receive = 0;
+        char buf[10]; 
 
         client_addr_size = sizeof(client_addr);
         client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
@@ -117,7 +118,7 @@ int main (void)
                 exit(1);
             }
         
-            char buf[10]; 
+            
             file = fopen("locations.txt", "r");
             while (fgets(buf, 10, file) != NULL)
                 for ( int i=0; i<8; i++ )
@@ -235,13 +236,12 @@ int main (void)
                 i++;
             }
             close(client_socket);
-        }(while i == index)
+        }while (i != index);
         
-        //run run run until get User's Present location..
+        //run until get User's Present location..
 /*
         int onBoard = 0;
 */
-
             case 'z' :
 /*Number 3*/
         while (1){
@@ -254,11 +254,15 @@ int main (void)
                 }
                 read( client_socket, buff_rcv, BUFF_SIZE);
                 printf("%s\n", buff_rcv);
-            }while(buff_rcv[0] == 'x');
+            }while(buff_rcv[0] == 'x');// exclude 'x' status, exit if not 'x'
             
-            write( client_socket, buff_snd, strlen(buff_snd) );
-            if (buff_snd[0] == 'D' && buff_snd[1] == '0') break;
-            
+            write(client_socket, buff_snd, strlen(buff_snd));
+            printf("buff_snd : %s\n", buff_snd);
+            if (buff_snd[0] == 'D' && buff_snd[1] == '0') break;// send ending info, end all processes
+            memset(buff_snd, 0, sizeof(buff_snd));
+
+
+
             if ( buff_rcv[0] == 'U' ){ // receive from mobile application 
                 if ( buff_rcv[1] == '1' ){ //arrive at User's Present Location
                     printf("user checked in the car \n");
@@ -277,16 +281,22 @@ int main (void)
                 }
                 printf("%s\n", DataSend_D);
             }
-            else {
+            else if (buff_rcv[0] == 'z'){
                 char buf[10];
                 file = fopen("locations.txt", "r");
                 while (fgets(buf, 10, file) != NULL)
                     for ( int i=0; i<8; i++ )
                         DataSend_R[i+1] = buf[i];
-                fclose(file);
-                DataSend_R[7]='\0';
+                    DataSend_R[9] = '\0';//for strcpy
+                if (buff_rcv[1] == 'B'){
+                    for ( int i=0; i<4; i++ ) {
+                        DataSend_R[i+1] = buf[i+4];
+                        DataSend_R[i+5] = buf[i];
+                        
+                    }
+                }
                 strcpy(buff_snd, DataSend_R);
-                printf("%s\n", DataSend_R);
+                buff_snd[9] = 'E';   
             }
             close(client_socket);
         } // 3rd loop
