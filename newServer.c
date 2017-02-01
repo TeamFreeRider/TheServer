@@ -253,11 +253,11 @@ int main (void)
                     exit(1);
                 }
                 read( client_socket, buff_rcv, BUFF_SIZE);
-                printf("%s\n", buff_rcv);
+                //printf("%s\n", buff_rcv);
             }while(buff_rcv[0] == 'x');// exclude 'x' status, exit if not 'x'
             
             write(client_socket, buff_snd, strlen(buff_snd));
-            printf("buff_snd : %s\n", buff_snd);
+            //printf("buff_snd : %s\n", buff_snd);
             if (buff_snd[0] == 'D' && buff_snd[1] == '0') break;// send ending info, end all processes
             memset(buff_snd, 0, sizeof(buff_snd));
 
@@ -292,11 +292,11 @@ int main (void)
                     for ( int i=0; i<4; i++ ) {
                         DataSend_R[i+1] = buf[i+4];
                         DataSend_R[i+5] = buf[i];
-                        
                     }
                 }
                 strcpy(buff_snd, DataSend_R);
                 buff_snd[9] = 'E';   
+                printf("x : %c%c, y : %c%c\n", DataSend_R[1], DataSend_R[2], DataSend_R[3], DataSend_R[4]);
             }
             close(client_socket);
         } // 3rd loop
