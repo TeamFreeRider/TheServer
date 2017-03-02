@@ -36,7 +36,7 @@ int main( int argc, char **argv){
       memset( &server_addr, 0, sizeof( server_addr));
       server_addr.sin_family = AF_INET;
       server_addr.sin_port = htons(4000);
-      server_addr.sin_addr.s_addr= inet_addr("192.168.0.6");//write the server$
+      server_addr.sin_addr.s_addr= inet_addr("192.168.0.9");//write the server$
 
       if( -1 == connect( client_socket, (struct sockaddr*)&server_addr, sizeof( server_addr) ) )
       {
@@ -44,7 +44,7 @@ int main( int argc, char **argv){
          exit(1);
       }
       
-      char arr[9] = {'1','3','0','0','0','0','3','0','0'};
+      char arr[9] = {'1','3','6','0','0','4','0','2','8'};
       int i;
       arr[0] = 'C';      
    

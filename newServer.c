@@ -92,7 +92,7 @@ int main (void)
         int mini = 0;
         int index = 0;
         int receive = 0;
-        char buf[10]; 
+        
 
         client_addr_size = sizeof(client_addr);
         client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
@@ -108,21 +108,51 @@ int main (void)
 
             case 'x' : 
 
+            BACK : 
 /*Number 1*/      
 	   while (1) {	
         
-            client_addr_size = sizeof(client_addr);
-            client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
-            if ( -1 == client_socket) {
-                printf( "fail\n");
-                exit(1);
+            while(1){
+                client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
+                if ( -1 != client_socket) 
+                    break;
+                //printf("%s\n", buff_rcv);
             }
         
+            char buf[10];
             
-            file = fopen("locations.txt", "r");
-            while (fgets(buf, 10, file) != NULL)
+            FILE *file = fopen("locations.txt", "r+");
+            if (file != NULL){
+                fgets(buf, 9, file);
+                fclose(file);
+            }
+            else if (file == NULL) {
+                printf("file is null\n");
+                FILE *file2 = fopen("locations.txt", "r+");
+                if (file2 != NULL){
+                    fgets(buf, 9, file2);
+                    fclose(file2);
+                }
+                else if (file2 == NULL){
+                    printf("funking error\n");
+                    close(client_socket);
+                    goto BACK;
+                }
+
+                //close ( client_socket );
+                goto BACK;
+            }
+
+            if (strlen(buf) == 8)
                 for ( int i=0; i<8; i++ )
                     DataSend_R[i+1] = buf[i];
+            else if (strlen(buf) != 8) {
+                printf("buff isn't 8\n");
+                close ( client_socket );
+                goto BACK;
+            }
+            printf("strlen(buf): %d", strlen(buf));
+
             read( client_socket, buff_rcv, BUFF_SIZE);
             if (buff_rcv[1] == 'R')
                 write( client_socket, DataSend_R, strlen(DataSend_R)+1 );
@@ -143,7 +173,6 @@ int main (void)
 		        break; 
 	        }
             printf("%s\n", DataSend_R);
-            fclose(file);
             
         }
 	//if request(C:call) singal comes in, save data and move on to next
@@ -164,7 +193,7 @@ int main (void)
             printf("%s를 보냄\n", DataSend_P);
             close ( client_socket );
             time(&aftrSEC);
-        } while(aftrSEC - bfrSEC < 2);
+        } while(aftrSEC - bfrSEC < 1);
 
 
             case 'y' :  
@@ -204,7 +233,9 @@ int main (void)
                 goto RECEIVE;
             }
 	        //Find Minimum value
-            else if ( receive >= 4 && index > 0 ) break;
+            else if ( receive >= 4 && index > 0 )
+                break;
+
 	        else range++; // if all value is lower than 0, add 1 to range
         }
         close(client_socket);
@@ -223,7 +254,8 @@ int main (void)
         printf("%c\n",carlist[mini].color);
         DataSend_C[1]= carlist[mini].color;
         i = 0;
-	    do{
+
+
             client_addr_size = sizeof(client_addr);
             client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
             if ( -1 == client_socket) {
@@ -231,12 +263,13 @@ int main (void)
                 exit(1);
             }
             read( client_socket, buff_rcv, BUFF_SIZE);
+            printf("buff rcv : %s\n", buff_rcv);
             if (buff_rcv[1] == carlist[i].color){
                 write( client_socket, DataSend_C, strlen(DataSend_C)+1 ); // send selected car info
-                i++;
+                printf("DataSend_C : %s\n", DataSend_C);
             }
             close(client_socket);
-        }while (i != index);
+
         
         //run until get User's Present location..
 /*
@@ -255,11 +288,12 @@ int main (void)
                 read( client_socket, buff_rcv, BUFF_SIZE);
                 //printf("%s\n", buff_rcv);
             }while(buff_rcv[0] == 'x');// exclude 'x' status, exit if not 'x'
+	        printf("received : %s\n", buff_rcv);
             
-            write(client_socket, buff_snd, strlen(buff_snd));
-            //printf("buff_snd : %s\n", buff_snd);
+            write(client_socket, buff_snd, strlen(buff_snd)+1);
+            printf("send : buff_snd : %s\n", buff_snd);
             if (buff_snd[0] == 'D' && buff_snd[1] == '0') break;// send ending info, end all processes
-            memset(buff_snd, 0, sizeof(buff_snd));
+            //memset(buff_snd, 0, sizeof(buff_snd));
 
 
 
@@ -284,19 +318,23 @@ int main (void)
             else if (buff_rcv[0] == 'z'){
                 char buf[10];
                 file = fopen("locations.txt", "r");
-                while (fgets(buf, 10, file) != NULL)
+                /*while (fgets(buf, 10, file) != NULL)*/
+                fgets(buf, 9, file);
+                if (file != NULL){
                     for ( int i=0; i<8; i++ )
                         DataSend_R[i+1] = buf[i];
                     DataSend_R[9] = '\0';//for strcpy
+                }
                 if (buff_rcv[1] == 'B'){
                     for ( int i=0; i<4; i++ ) {
                         DataSend_R[i+1] = buf[i+4];
                         DataSend_R[i+5] = buf[i];
                     }
                 }
+                fclose(file);
                 strcpy(buff_snd, DataSend_R);
                 buff_snd[9] = 'E';   
-                printf("x : %c%c, y : %c%c\n", DataSend_R[1], DataSend_R[2], DataSend_R[3], DataSend_R[4]);
+                //printf("x : %c%c, y : %c%c\n", DataSend_R[1], DataSend_R[2], DataSend_R[3], DataSend_R[4]);
             }
             close(client_socket);
         } // 3rd loop
